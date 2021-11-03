@@ -1,0 +1,14 @@
+src/portweb/.editorconfig
+src/portweb/.env.example
+src/portweb/.env.testing
+src/portweb/.gitattributes
+src/portweb/.gitignore
+src/portweb/.php_cs.dist
+src/portweb/.phpunit.result.cache
+src/portweb/.styleci.yml
+src/portweb/ER.png
+src/portweb/node_modules
+src/portweb/package-lock.json
+src/portweb/package.json
+src/portweb/vendor
+src/portweb/webpack.mix.js

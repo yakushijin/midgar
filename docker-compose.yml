@@ -1,0 +1,75 @@
+version: "3.7"
+
+services:
+  laravel:
+    container_name: laravel_host
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: app-mounted
+      args:
+        DEBUG: install
+        TEST: install
+    tty: true
+    volumes:
+      - ./src:/var/www
+      - ./docker/config/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
+    ports:
+      - 8080:80
+    networks:
+      - docker-net
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  # see https://hub.docker.com/_/mysql/
+  mysql:
+    container_name: mysql_host
+    image: mysql:8.0
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: rootPassword!
+      MYSQL_DATABASE: devlocaldb
+      MYSQL_USER: devlocaluser
+      MYSQL_PASSWORD: devlocalPw1!
+      TZ: Asia/Tokyo
+    ports:
+      - 3306:3306
+    expose:
+      - "3306"
+    networks:
+      - docker-net
+    volumes:
+      - ./docker/data/mysql:/var/lib/mysql
+      - ./docker/db/sql:/docker-entrypoint-initdb.d
+
+  redis:
+    container_name: redis_host
+    image: redis:6-buster
+    environment:
+      TZ: Asia/Tokyo
+    ports:
+      - 6379:6379
+    expose:
+      - "6379"
+    networks:
+      - docker-net
+    volumes:
+      - ./docker/data/redis:/data
+
+  # see https://hub.docker.com/_/adminer/
+  adminer:
+    container_name: adminer_host
+    image: adminer:4.7-standalone
+    environment:
+      ADMINER_DEFAULT_SERVER: mysql_host
+    ports:
+      - "8081:8080"
+    expose:
+      - "8081"
+    networks:
+      - docker-net
+
+networks:
+  docker-net:
+    driver: bridge
